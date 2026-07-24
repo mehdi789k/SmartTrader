@@ -40,7 +40,7 @@ docker-compose logs -f frontend
 
 ## Notes
 
-- MetaTrader5 Python module requires Windows platform
+- MetaTrader5 Python module requires Windows platform. The backend container can still build on Linux if MT5 is skipped via platform-specific dependency markers.
 - For production use, update SECRET_KEY in docker-compose.yml
 - Adjust CORS_ORIGINS for your domain
 - Enable volume mounting for logs persistence

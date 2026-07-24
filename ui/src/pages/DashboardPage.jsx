@@ -10,6 +10,9 @@ import CustomIndicatorsPanel from '../components/CustomIndicatorsPanel'
 import TradingHeader from '../components/TradingHeader'
 import { api } from '../api'
 import AccountSettingsPanel from '../components/AccountSettingsPanel'
+import Settings from '../components/Settings'
+import Chart from '../components/Chart'
+import SmartSignal from '../components/SmartSignal'
 import { useAuthStore } from '../store'
 
 ChartJS.register(ArcElement, CategoryScale, Filler, Legend, LinearScale, LineElement, PointElement, Tooltip)
@@ -266,6 +269,43 @@ const DashboardPage = () => {
   const [batchLoading, setBatchLoading] = useState(false)
   const [activeAction, setActiveAction] = useState('')
   const logout = useAuthStore((state) => state.logout)
+
+  const priceSeries = useMemo(() => {
+    const values = Array.isArray(data?.candles) ? data.candles.map((candle) => Number(candle.close)).filter((value) => Number.isFinite(value)) : []
+    return values
+  }, [data])
+
+  const ohlcChartData = useMemo(() => {
+    const candles = Array.isArray(data?.candles) ? data.candles : []
+    const values = candles.map((candle) => ({
+      open: Number(candle.open),
+      high: Number(candle.high),
+      low: Number(candle.low),
+      close: Number(candle.close),
+      volume: Number(candle.tick_volume || candle.real_volume || candle.volume || 0),
+    })).filter((entry) => Number.isFinite(entry.open) && Number.isFinite(entry.high) && Number.isFinite(entry.low) && Number.isFinite(entry.close))
+    return values
+  }, [data])
+
+  const chartData = useMemo(() => {
+    if (Array.isArray(ohlcChartData) && ohlcChartData.length > 0) {
+      return ohlcChartData.map((item, index) => ({
+        time: index + 1,
+        open: Number(item.open ?? item.o ?? 0),
+        high: Number(item.high ?? item.h ?? 0),
+        low: Number(item.low ?? item.l ?? 0),
+        close: Number(item.close ?? item.c ?? 0),
+      }))
+    }
+
+    return [
+      { time: 1, open: 1.0852, high: 1.0868, low: 1.0841, close: 1.0859 },
+      { time: 2, open: 1.0859, high: 1.0874, low: 1.0846, close: 1.0863 },
+      { time: 3, open: 1.0863, high: 1.0880, low: 1.0854, close: 1.0871 },
+      { time: 4, open: 1.0871, high: 1.0886, low: 1.0862, close: 1.0876 },
+      { time: 5, open: 1.0876, high: 1.0890, low: 1.0868, close: 1.0882 },
+    ]
+  }, [ohlcChartData])
   const confirmCallbackRef = React.useRef(null)
   const symbolSearchRef = useRef(null)
   const suppressSuggestionHideRef = React.useRef(false)
@@ -1440,9 +1480,6 @@ const DashboardPage = () => {
   }, [baseCandles, filterFrom, filterTo, minVolumeFilter, filterSessionKeys, data, filterCloseAboveSMA, filterSMAPeriod, filterRSIEnabled, filterRSILevel, filterRSIAbove, filterMACDEnabled, filterMACDHistEnabled, filterMACDHistThreshold, filterVolumeSpikeEnabled, filterVolumeSpikeMultiplier, filterCandleDirection, filterMACrossoverEnabled, filterMAFastPeriod, filterMASlowPeriod, filterMACrossoverRequireCross, filterMASlopeEnabled, filterMASlopePeriod, filterMASlopeThreshold, filterADXEnabled, filterADXPeriod, filterADXThreshold, filterBollingerEnabled, filterBollingerPeriod, filterBollingerStd, filterATRBreakoutEnabled, filterATRPeriod, filterATRMultiplier, filterVWAPEnabled, filterHeikenEnabled, filterHeikenConsecutive, filterSuperTrendEnabled, filterSuperTrendATRPeriod, filterSuperTrendMultiplier, filterOBVEnabled, filterMFIEnabled, filterMFIPeriod, filterMFIThreshold, indicators, htfEnabled, htfData, htfDirection])
 
 
-  const priceSeries = useMemo(() => candles.map((candle) => Number(candle.close)).filter((value) => Number.isFinite(value)), [candles])
-  const ohlcChartData = useMemo(() => { const values = candles.map((candle) => ({ open: Number(candle.open), high: Number(candle.high), low: Number(candle.low), close: Number(candle.close), volume: Number(candle.tick_volume || candle.real_volume || candle.volume || 0) })).filter((entry) => Number.isFinite(entry.open) && Number.isFinite(entry.high) && Number.isFinite(entry.low) && Number.isFinite(entry.close)); return values }, [candles])
-
   const signalPanel = useMemo(() => {
     const latest = ohlcChartData[ohlcChartData.length - 1]
     const previous = ohlcChartData[ohlcChartData.length - 2]
@@ -1681,9 +1718,12 @@ const DashboardPage = () => {
               <Button type='button' variant='success' className='w-full justify-center' onClick={() => handleExport(symbol)} disabled={loading}>
                 ذخیره تایم‌فریم
               </Button>
-                <div className='pt-3'>
-                  <AccountSettingsPanel onConnected={(acc) => setStatusMessage(`حساب ${acc.label} متصل شد.`)} />
-                </div>
+              <div className='pt-3'>
+                <Settings />
+              </div>
+              <div className='pt-3'>
+                <AccountSettingsPanel onConnected={(acc) => setStatusMessage(`حساب ${acc.label} متصل شد.`)} />
+              </div>
               <Button type='button' variant='secondary' className='w-full justify-center' onClick={() => setIsFullscreen((value) => !value)}>
                 {isFullscreen ? 'خروج از تمام‌صفحه' : 'نمایش تمام‌صفحه'}
               </Button>
@@ -1697,6 +1737,29 @@ const DashboardPage = () => {
         <Modal open={confirmOpen} title={confirmTitle} onCancel={handleModalCancel} onConfirm={handleModalConfirm} confirmLabel='تأیید' cancelLabel='انصراف'>
           <div className='text-sm'>{confirmText}</div>
         </Modal>
+
+        <section aria-labelledby='price-analytics' className='space-y-4'>
+          <div className='rounded-[28px] border border-slate-700/40 bg-slate-950/60 p-5 shadow-2xl shadow-black/20 backdrop-blur-xl'>
+            <div className='mb-4 flex flex-wrap items-center justify-between gap-3'>
+              <div>
+                <h2 id='price-analytics' className={`text-lg font-bold ${theme.text}`}>نمودار قیمت حرفه‌ای</h2>
+                <p className={`text-sm ${theme.muted}`}>نمایش لحظه‌ای قیمت با سبک حرفه‌ای و قابل تنظیم.</p>
+              </div>
+              <Badge variant='teal'>Lightweight Charts</Badge>
+            </div>
+            <Chart data={chartData} symbol={symbol} timeframe={timeframe} darkMode={darkMode} />
+          </div>
+
+          <div className='rounded-[28px] border border-slate-700/40 bg-slate-950/60 p-5 shadow-2xl shadow-black/20 backdrop-blur-xl'>
+            <SmartSignal
+              price={priceSeries[priceSeries.length - 1] ?? 1.085}
+              atr={0.0014}
+              trend={priceSeries[priceSeries.length - 1] > (priceSeries[priceSeries.length - 2] ?? priceSeries[priceSeries.length - 1]) ? 'up' : 'down'}
+              symbol={symbol}
+              timeframe={timeframe}
+            />
+          </div>
+        </section>
 
         <section aria-labelledby='status-summary' className='space-y-4'>
           <div className='flex flex-col gap-4 md:flex-row md:items-end md:justify-between'>

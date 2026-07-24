@@ -12,6 +12,8 @@ from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from .api import router
+from .api.v1 import settings as settings_router
+from .api.v1 import data_management as data_router
 from .config import config
 from .core.mt5_service import mt5_service
 
@@ -39,6 +41,8 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(settings_router.router)
+app.include_router(data_router.router)
 
 # ========================
 # Frontend SPA routes

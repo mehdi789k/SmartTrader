@@ -1,7 +1,7 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { createProxyMiddleware } from 'express-http-proxy';
+import expressHttpProxy from 'express-http-proxy';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -23,13 +23,13 @@ app.use(express.static(join(__dirname, 'dist')));
 app.use(express.json());
 
 // Proxy API requests
-app.use('/api', createProxyMiddleware({
-  target: API_TARGET,
+app.use('/api', expressHttpProxy(API_TARGET, {
+  proxyReqPathResolver: (req) => req.originalUrl,
   changeOrigin: true,
-  pathRewrite: {
-    '^/api': '/api',
+  userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+    return proxyResData;
   },
-  onError: (err, req, res) => {
+  proxyErrorHandler: (err, res, next) => {
     console.error('Proxy error:', err);
     res.status(500).json({ error: 'Proxy error' });
   }

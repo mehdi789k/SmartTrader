@@ -20,14 +20,16 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install serve to run the production build
-RUN npm install -g serve
+# Copy package files and install runtime dependencies
+COPY package*.json ./
+RUN npm install --production
 
-# Copy built application from builder
+# Copy built application and runtime server
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/server.js ./server.js
 
 # Expose port
 EXPOSE 3000
 
-# Run application
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# Run Express static server with API proxy
+CMD ["node", "server.js"]

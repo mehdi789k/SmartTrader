@@ -4,10 +4,14 @@ python-multipart==0.0.6
 pydantic==2.5.0
 pydantic-settings==2.1.0
 numpy<2
-MetaTrader5==5.0.47
+MetaTrader5==5.0.47; sys_platform == "win32"
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-dotenv==1.0.0
 aiofiles==23.2.1
 cors==1.0.1
 httpx==0.25.2
+SQLAlchemy[asyncio]==2.0.22
+asyncpg==0.31.0
+pandas==2.2.3
+pyarrow==25.0.0

@@ -16,8 +16,9 @@ async function main() {
     const input = raw ? JSON.parse(raw) : {};
     const toolName = input.toolName || 'ابزار نامشخص';
     const prompt = input.userPrompt || '';
-
-    const message = `تأیید قبل از اجرای ابزار: ${toolName}\nمتن درخواست کاربر: ${prompt}`;
+    
+    const message = `تأیید قبل از اجرای ابزار: ${toolName}\nمتن درخواست کاربر: ${prompt}\n\nآیا اجازه اجرای این دستور را صادر می‌کنید؟`;
+    
     const output = {
       hookSpecificOutput: {
         hookEventName: 'PreToolUse',
@@ -25,7 +26,7 @@ async function main() {
         permissionDecisionReason: message
       }
     };
-
+    
     process.stdout.write(JSON.stringify(output));
     process.exit(0);
   } catch (err) {

@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
   # Backend API
   backend:
     build:
-      context: ./app
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: app/Dockerfile
     container_name: smarttred-backend
     ports:
       - "8000:8000"
@@ -16,8 +14,7 @@ services:
       - LOG_LEVEL=INFO
       - CORS_ORIGINS=http://localhost:3000,http://localhost,http://frontend:3000
     volumes:
-      - ./app:/app
-      - ./app/logs:/app/logs
+      - ./app/logs:/app/app/logs
     networks:
       - smarttred-network
     restart: unless-stopped
@@ -36,12 +33,34 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_API_BASE_URL=http://backend:8000
+      - API_TARGET=http://backend:8000
     depends_on:
       - backend
     networks:
       - smarttred-network
     restart: unless-stopped
+
+  # TimescaleDB (PostgreSQL + Timescale)
+  timescaledb:
+    image: timescale/timescaledb:2.11.0-pg14
+    container_name: smarttred-timescaledb
+    environment:
+      - POSTGRES_USER=smarttred
+      - POSTGRES_PASSWORD=smarttredpass
+      - POSTGRES_DB=smarttred_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./docker/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - smarttred-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smarttred -d smarttred_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   smarttred-network:
@@ -49,4 +68,6 @@ networks:
 
 volumes:
   logs:
+    driver: local
+  db_data:
     driver: local

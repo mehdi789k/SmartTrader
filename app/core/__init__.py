@@ -20,6 +20,8 @@ from .models import (
     RiskAssessmentModel,
 )
 from .mt5_service import MT5Service
+from . import config
+from . import database
 
 __all__ = [
     "token_manager",
@@ -42,4 +44,6 @@ __all__ = [
     "evaluate_trade_request",
     "is_within_session",
     "MT5Service",
+     "config",
+     "database",
 ]

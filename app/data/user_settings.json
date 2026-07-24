@@ -1,0 +1,6 @@
+{
+  "riskPercent": 2,
+  "defaultLot": 0.1,
+  "refreshInterval": "1m",
+  "autoTradingEnabled": false
+}

@@ -10,19 +10,19 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements
-COPY requirements.txt .
+COPY app/requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY . .
+# Copy application package into container
+COPY app /app/app
 
-# Create logs directory
-RUN mkdir -p logs
+# Create logs directory inside app package
+RUN mkdir -p /app/app/logs
 
 # Expose port
 EXPOSE 8000
 
-# Run application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run application through package path
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
