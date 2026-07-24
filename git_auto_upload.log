@@ -1,0 +1,9 @@
+Fri Jul 24 07:14:17 2026 - >>> اجرای دستور: git --version
+Fri Jul 24 07:14:17 2026 - ✔ پوشه دارای گیت است → بررسی سلامت...
+Fri Jul 24 07:14:17 2026 - >>> اجرای دستور: git status
+Fri Jul 24 07:14:17 2026 - >>> اجرای دستور: git remote remove origin
+Fri Jul 24 07:14:17 2026 - >>> اجرای دستور: git remote add origin https://github.com/mehdi789k/Smart-Tred
+Fri Jul 24 07:14:17 2026 - 📌 بررسی برنچ فعلی...
+Fri Jul 24 07:14:17 2026 - ✔ برنچ فعلی: main
+Fri Jul 24 07:14:17 2026 - 📌 اضافه کردن همه فایل‌ها...
+Fri Jul 24 07:14:17 2026 - >>> اجرای دستور: git add .

@@ -1,47 +1,94 @@
 import os
 import subprocess
+import sys
+import time
+
+LOG_FILE = "git_auto_upload.log"
+
+def log(msg):
+    with open(LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(f"{time.ctime()} - {msg}\n")
+    print(msg)
 
 def run(cmd):
-    print(f"\n>>> {cmd}")
-    result = subprocess.run(cmd, shell=True)
+    log(f">>> اجرای دستور: {cmd}")
+    result = subprocess.run(cmd, shell=True, text=True)
+    if result.returncode != 0:
+        log(f"⚠️ خطا در اجرای دستور: {cmd}")
     return result.returncode
 
-def main():
-    print("=== انتقال خودکار فایل‌ها به GitHub ===")
-
-    github_url = input("لینک ریپازیتوری GitHub را وارد کنید: ").strip()
-
-    # بررسی اینکه گیت نصب است
+def check_git():
     if run("git --version") != 0:
-        print("❌ Git روی سیستم نصب نیست یا در PATH نیست.")
-        return
+        log("❌ Git نصب نیست یا در PATH نیست.")
+        sys.exit()
 
-    # بررسی اینکه پوشه گیت دارد
+def ensure_repo():
     if not os.path.exists(".git"):
-        print("📌 پوشه گیت ندارد → در حال ساخت ریپازیتوری جدید...")
+        log("📌 پوشه گیت ندارد → ساخت ریپازیتوری جدید...")
         run("git init")
     else:
-        print("✔️ پوشه دارای گیت است، بررسی صحت...")
+        log("✔ پوشه دارای گیت است → بررسی سلامت...")
         if run("git status") != 0:
-            print("⚠️ پوشه گیت خراب است → در حال ساخت مجدد...")
+            log("⚠ پوشه گیت خراب است → بازسازی...")
             run("rmdir /s /q .git")
             run("git init")
 
-    # تنظیم ریموت
+def ensure_remote(url):
     run("git remote remove origin")
-    run(f"git remote add origin {github_url}")
+    run(f"git remote add origin {url}")
 
-    # اضافه کردن فایل‌ها
+def ensure_branch():
+    log("📌 بررسی برنچ فعلی...")
+    result = subprocess.run("git branch --show-current", shell=True, capture_output=True, text=True)
+    branch = result.stdout.strip()
+
+    if branch == "":
+        log("⚠ هیچ برنچی فعال نیست → ساخت برنچ main")
+        run("git checkout -b main")
+        return "main"
+
+    log(f"✔ برنچ فعلی: {branch}")
+    return branch
+
+def auto_resolve_conflicts():
+    log("📌 تلاش برای حل خودکار کانفلیکت‌ها...")
+    run('git merge --strategy-option theirs')
+    run('git add .')
+    run('git commit -m "Auto-resolved merge conflicts"')
+
+def main():
+    print("=== نسخه پیشرفته انتقال پروژه‌های بزرگ به GitHub ===")
+
+    github_url = input("لینک ریپازیتوری GitHub را وارد کنید: ").strip()
+
+    check_git()
+    ensure_repo()
+    ensure_remote(github_url)
+
+    branch = ensure_branch()
+
+    log("📌 اضافه کردن همه فایل‌ها...")
     run("git add .")
 
-    # کامیت
-    run('git commit -m "Auto upload"')
+    log("📌 کامیت تغییرات...")
+    run('git commit -m "Enterprise Auto Upload"')
 
-    # پوش
-    run("git branch -M main")
-    run("git push -u origin main")
+    log("📌 Pull برای جلوگیری از کانفلیکت...")
+    pull_code = run(f"git pull origin {branch} --allow-unrelated-histories")
 
-    print("\n🎉 همه فایل‌ها با موفقیت منتقل شدند!")
+    if pull_code != 0:
+        log("⚠ کانفلیکت شناسایی شد → تلاش برای حل خودکار...")
+        auto_resolve_conflicts()
+
+    log("📌 پوش نهایی...")
+    push_code = run(f"git push -u origin {branch}")
+
+    if push_code != 0:
+        log("⚠ پوش ناموفق → تلاش با برنچ main")
+        run("git branch -M main")
+        run("git push -u origin main")
+
+    log("\n🎉 نسخه پیشرفته با موفقیت اجرا شد!")
 
 if __name__ == "__main__":
     main()
