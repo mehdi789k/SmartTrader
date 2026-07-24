@@ -2,6 +2,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 # 🚀 Smart Tred - MetaTrader5 Web Interface
 
 > Professional web application for connecting to MetaTrader5 and managing trading accounts
@@ -114,3 +115,6 @@ Smart Tred/
 =======
 # SmartTrader
 >>>>>>> be91ce71505bd833980057b1b7ea280ed59194b1
+=======
+# SmartTrader
+>>>>>>> 4215a45b7acacc8f834984427531ecd3382a718b
