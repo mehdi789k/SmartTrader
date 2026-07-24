@@ -1,0 +1,19 @@
+Metadata-Version: 2.4
+Name: smarttred-backend
+Version: 0.1.0
+Summary: Smart Tred FastAPI backend for MetaTrader5
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi==0.104.1
+Requires-Dist: uvicorn==0.24.0
+Requires-Dist: python-multipart==0.0.6
+Requires-Dist: pydantic==2.5.0
+Requires-Dist: pydantic-settings==2.1.0
+Requires-Dist: MetaTrader5==5.0.45
+Requires-Dist: python-jose[cryptography]==3.3.0
+Requires-Dist: passlib[bcrypt]==1.7.4
+Requires-Dist: python-dotenv==1.0.0
+Requires-Dist: aiofiles==23.2.1
+Requires-Dist: cors==1.0.1
+Requires-Dist: httpx==0.25.2
+Dynamic: requires-python

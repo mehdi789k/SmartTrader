@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Install UI deps",
+			"type": "shell",
+			"command": "npm install",
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Start Vite UI",
+			"type": "shell",
+			"command": "npm run dev -- --host 127.0.0.1 --port 3000",
+			"args": [],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

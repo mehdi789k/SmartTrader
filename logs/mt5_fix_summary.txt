@@ -1,0 +1,9 @@
+Date: 2026-07-18
+Status: MT5 connection and login flow verified successfully.
+What changed:
+- Added a broader MT5 terminal discovery routine for common installation locations.
+- Preserved the last MT5 initialization error and surfaced it in login failures.
+- Added regression coverage for terminal discovery and close-position error propagation.
+Verification:
+- MT5Service.connect(...) returned True.
+- API login endpoint returned HTTP 200.

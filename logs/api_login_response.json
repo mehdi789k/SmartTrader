@@ -1,0 +1,9 @@
+{
+  "status": 200,
+  "data": {
+    "success": true,
+    "message": "ورود موفق و MT5 فعال شد",
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5MTI4Mzg2MCIsInNlcnZlciI6IkxpdGVGaW5hbmNlLU1UNS1EZW1vIiwidHlwZSI6ImFjY2VzcyIsImV4cCI6MTc4NDYxNDk2Mn0.OhDAYh28-naZJpzTNtaiIqrlo7HKxYS0O44ZxvbD_ko",
+    "token_type": "bearer"
+  }
+}

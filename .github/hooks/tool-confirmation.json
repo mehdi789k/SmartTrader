@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": "node .github/hooks/tool-confirmation.js",
+        "timeout": 15,
+        "cwd": "${workspaceFolder}"
+      }
+    ]
+  }
+}

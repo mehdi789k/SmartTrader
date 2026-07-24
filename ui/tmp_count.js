@@ -1,0 +1,1 @@
+const fs=require('fs');const s=fs.readFileSync('src/pages/DashboardPage.jsx','utf8');console.log('len',s.length);['{','}','`','"','\'"'","/"].forEach(ch=>console.log(ch, (s.split(ch).length-1)));

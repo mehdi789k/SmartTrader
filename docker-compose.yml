@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # Backend API
+  backend:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: smarttred-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=change-this-in-production
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - LOG_LEVEL=INFO
+      - CORS_ORIGINS=http://localhost:3000,http://localhost,http://frontend:3000
+    volumes:
+      - ./app:/app
+      - ./app/logs:/app/logs
+    networks:
+      - smarttred-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend UI
+  frontend:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    container_name: smarttred-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_BASE_URL=http://backend:8000
+    depends_on:
+      - backend
+    networks:
+      - smarttred-network
+    restart: unless-stopped
+
+networks:
+  smarttred-network:
+    driver: bridge
+
+volumes:
+  logs:
+    driver: local
